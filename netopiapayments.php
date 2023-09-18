@@ -45,23 +45,37 @@ function netopiapayments_init() {
     if (getNtpApiVer() == 1) {
         // If we made it this far, then include our Gateway Class
         include_once( 'wc-netopiapayments-gateway.php' );
+        include_once( 'wc-netopiapayments-update-key.php' );
 
         
         add_action( 'admin_enqueue_scripts', 'netopiapaymentsjs_init' );
         function netopiapaymentsjs_init($hook) {
-         if ( 'woocommerce_page_wc-settings' != $hook ) {
-                return;
-             }
-            wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'js/netopiapayments_.js',array('jquery'),'2.0' ,true);
-            wp_enqueue_script( 'netopiatoastrjs', plugin_dir_url( __FILE__ ) . 'js/toastr.min.js',array(),'2.0' ,true);
-            wp_enqueue_style('netopiatoastrcss', plugin_dir_url( __FILE__ ) . 'css/toastr.min.css',array(),'2.0' ,false);
-              }
+            if ( 'woocommerce_page_wc-settings' != $hook ) {
+                    return;
+                }
+                // wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'js/netopiapayments_.js',array('jquery'),'2.0' ,true);
+                // wp_enqueue_script( 'netopiatoastrjs', plugin_dir_url( __FILE__ ) . 'js/toastr.min.js',array(),'2.0' ,true);
+                // wp_enqueue_style('netopiatoastrcss', plugin_dir_url( __FILE__ ) . 'css/toastr.min.css',array(),'2.0' ,false);
+                 
+                // Get ntp_notify_value if exist
+                 $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
+                 $ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
+ 
+                 wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiapayments.js',array('jquery'),'1.1' ,true);
+                 wp_enqueue_script( 'netopiaUIjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiaCustom.js',array(),'1.2' ,true);
+                 wp_localize_script( 'netopiaUIjs', 'netopiaUIPath_data', array(
+                     'plugin_url' => getAbsoulutFilePath(),
+                     'site_url' => get_site_url(),
+                     'ntp_notify' => $ntpNotify,
+                     )
+                 );
+            }
     } else {
         // Api v2 Here 
 
         // If we made it this far, then include our Gateway Class
         include_once( 'v2/wc-netopiapayments-gateway.php' );
-        include_once( 'v2/wc-netopiapayments-auth.php' );
+        // include_once( 'v2/wc-netopiapayments-auth.php' );
 
         add_action( 'admin_enqueue_scripts', 'netopiapaymentsjs_init' );
         function netopiapaymentsjs_init($hook) {
@@ -105,12 +119,18 @@ function getAbsoulutFilePath() {
 	return $plugin_dir_path;
 }
 
-
+/**
+ * Decided which API should be used 
+ * Check if plugin is configured for API v2
+ * NOTE : it MUST HAVE LIVE API KEY in order to switch to api v2
+ */
 function getNtpApiVer() {
-    // $api2Configured = get_option('woocommerce_netopiapayments_apiv2_configured', false);
-    // var_dump($api2Configured);
-	$hasLiveApiKey = get_option('woocommerce_netopiapayments_live_api_key', false);
-	$apiV = isset($hasLiveApiKey) && !empty($hasLiveApiKey) ? 2 : 1;
+    $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
+    $hasLiveApiKey = array_key_exists('live_api_key', $ntpOptions) && !empty($ntpOptions['live_api_key']) ? true : false;
+    // $hasSandboxApiKey = array_key_exists('sandbox_api_key', $ntpOptions) && !empty($ntpOptions['sandbox_api_key']) ? true : false;
+	// $apiV = $hasLiveApiKey && $hasSandboxApiKey ? 2 : 1;
+
+    $apiV = $hasLiveApiKey ? 2 : 1;
     return $apiV;
 }
 

@@ -1,4 +1,11 @@
 <?php
+// For Version Api V1
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+include_once('v2/setting/static.php');
+
 class netopiapayments extends WC_Payment_Gateway {
 	// Setup our Gateway's id, description and other values
 	function __construct() {
@@ -9,6 +16,8 @@ class netopiapayments extends WC_Payment_Gateway {
 		$this->icon = NTP_PLUGIN_DIR . 'img/netopiapayments.gif';
 		$this->has_fields = true;
 		$this->notify_url        	= WC()->api_request_url( 'netopiapayments' );
+		$this->envMod                 = MODE_STARTUP;
+        // $this->envMod                 = MODE_NORMAL;
 
 		// Supports the default credit card form
 		$this->supports = array(
@@ -16,7 +25,8 @@ class netopiapayments extends WC_Payment_Gateway {
 	               'refunds'
 	               );
 		
-		$this->init_form_fields();
+		// $this->init_form_fields(); // call Old Admin Form - Temporary keep
+		$this->init_form_fields_forApiV2();
 		
 		$this->init_settings();
 		
@@ -48,100 +58,267 @@ class netopiapayments extends WC_Payment_Gateway {
 		add_action('woocommerce_receipt_netopiapayments', array(&$this, 'receipt_page'));
 	} 	
 
-	// Build the administration fields for this specific Gateway
-	public function init_form_fields() {
-		$this->form_fields = array(			
-			'enabled' => array(
-				'title'		=> __( 'Enable / Disable', 'netopiapayments' ),
-				'label'		=> __( 'Enable this payment gateway', 'netopiapayments' ),
-				'type'		=> 'checkbox',
-				'default'	=> 'no',
-			),
-			'environment' => array(
-				'title'		=> __( 'NETOPIA Payments Test Mode', 'netopiapayments' ),
-				'label'		=> __( 'Enable Test Mode', 'netopiapayments' ),
-				'type'		=> 'checkbox',
-				'description' => __( 'Place the payment gateway in test mode.', 'netopiapayments' ),
-				'default'	=> 'no',
-			),
-			'title' => array(
-				'title'		=> __( 'Title', 'netopiapayments' ),
-				'type'		=> 'text',
-				'desc_tip'	=> __( 'Payment title the customer will see during the checkout process.', 'netopiapayments' ),
-				'default'	=> __( 'NETOPIA Payments', 'netopiapayments' ),
-			),
-			'description' => array(
-				'title'		=> __( 'Description', 'netopiapayments' ),
-				'type'		=> 'textarea',
-				'desc_tip'	=> __( 'Payment description the customer will see during the checkout process.', 'netopiapayments' ),
-				'css'		=> 'max-width:350px;',
-			),
-			'default_status' => array(
-				'title'		=> __( 'Default status', 'netopiapayments' ),
-				'type'		=> 'select',
-				'desc_tip'	=> __( 'Default status of transaction.', 'netopiapayments' ),
-				'default'	=> 'processing',
-				'options' => array(
-					'completed' => __('Completed'),
-					'processing' => __('Processing'),
-				),
-				'css'		=> 'max-width:350px;',
-			),
-			'key_setting' => array(
-                'title'       => __( 'Login to Netopia and go to Admin-> Conturi de comerciant->Modifica (iconita creionas)->tab-ul Setari securitate', 'netopiapayments' ),
-                'type'        => 'title',
-                'description' => '',
+	    /**
+     * Build the administration fields for this specific Gateway
+     */
+	public function init_form_fields_forApiV2() {
+        $this->form_fields = array(
+            'enabled' => array(
+            'title'        => __( 'Enable / Disable', 'netopiapayments' ),
+            'label'        => __( 'Enable this payment gateway', 'netopiapayments' ),
+            'type'         => 'checkbox',
+            'description' => __( 'Disable / Enable of NETOPIA Payment method.', 'netopiapayments' ),
+            'desc_tip'    => true,
+            'default'      => 'no',
             ),
-			'account_id' => array(
-				'title'		=> __( 'Seller Account ID', 'netopiapayments' ),
-				'type'		=> 'text',
-				'desc_tip'	=> __( 'This is Account ID provided by Netopia when you signed up for an account. Unique key for your seller account for the payment process.', 'netopiapayments' ),
-			),
-            'live_cer' => array(
-                'title'		=> __( 'Live public key: ', 'netopiapayments' ),
-                'type'		=> 'file',
-                'desc_tip'	=> is_null($this->get_option('live_cer')) ?  __( 'Download the Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_cer'),
+            'environment'  => array(
+            'title'       => __( 'NETOPIA Payments Test Mode', 'netopiapayments' ),
+            'label'       => __( 'Enable Test Mode', 'netopiapayments' ),
+            'type'        => 'checkbox',
+            'description' => __( 'Place the payment gateway in test mode.', 'netopiapayments' ),
+            'desc_tip'    => true,
+            'default'     => 'no',
             ),
-            'live_key' => array(
-                'title'		=> __( 'Live private key: ', 'netopiapayments' ),
-                'type'		=> 'file',
-                'desc_tip'	=> is_null($this->get_option('live_key')) ? __( 'Download the Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_key'),
+            'title' => array(
+            'title'       => __( 'Title', 'netopiapayments' ),
+            'type'        => 'text',
+            'description' => __( 'Payment title the customer will see during the checkout process.', 'netopiapayments' ),
+            'desc_tip'    => true,
+            'default'     => __( 'NETOPIA Payments', 'netopiapayments' ),
             ),
-            'sandbox_cer' => array(
-                'title'		=> __( 'Sandbox public key: ', 'netopiapayments' ),
-                'type'		=> 'file',
-                'desc_tip'	=> is_null($this->get_option('sandbox_cer')) ? __( 'Download the Sandbox Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_cer'),
+            'description'  => array(
+            'title'       => __( 'Description', 'netopiapayments' ),
+            'type'        => 'textarea',
+            'description' => __( 'Payment description the customer will see during the checkout process.', 'netopiapayments' ),
+            'desc_tip'    => true,
+            'css'         => 'max-width:350px;',
             ),
-            'sandbox_key' => array(
-                'title'		=> __( 'Sandbox private key: ', 'netopiapayments' ),
-                'type'		=> 'file',
-                'desc_tip'	=> is_null($this->get_option('sandbox_key')) ? __( 'Download the Sandbox Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_key'),
+            'default_status' => array(
+            'title'        => __( 'Default status', 'netopiapayments' ),
+            'type'         => 'select',
+            'description'  => __( 'Default status of transaction.', 'netopiapayments' ),
+            'desc_tip'     => true,
+            'default'      => 'processing',
+            'options'      => array(
+            'completed'    => __('Completed'),
+            'processing'   => __('Processing'),
             ),
-			'payment_methods'   => array(
-		        'title'       => __( 'Payment methods', 'netopiapayments' ),
-		        'type'        => 'multiselect',
-		        'description' => __( 'Select which payment methods to accept.', 'netopiapayments' ),
-		        'default'     => '',
-		        'options'     => array(
-		          'credit_card'	      => __( 'Credit Card', 'netopiapayments' ),
-		          'sms'			        => __('SMS' , 'netopiapayments' ),
-		          'bank_transfer'		      => __( 'Bank Transfer', 'netopiapayments' ),
-		          'bitcoin'  => __( 'Bitcoin', 'netopiapayments' )
-		          ),
-		    ),	
-			'sms_setting' => array(
-				'title'       => __( 'For SMS Payment', 'netopiapayments' ),
-				'type'        => 'title',
-				'description' => '',
-			),	
-			'service_id' => array(
-				'title'		=> __( 'Product/service code: ', 'netopiapayments' ),
-				'type'		=> 'text',
-				'desc_tip'	=> __( 'This is Service Code provided by Netopia when you signed up for an account.', 'netopiapayments' ),
-				'description' => __( 'Login to Netopia and go to Admin -> Conturi de comerciant -> Produse si servicii -> Semnul plus', 'netopiapayments' ),
-			),
-		);		
-	}
+            'css'       => 'max-width:350px;',
+            )
+        );
+
+        if ($this->envMod == MODE_STARTUP ) {
+            $this->form_fields['wizard_setting'] =  array(
+                                                    'title'       => '',
+                                                    'type'        => 'title',
+                                                    'description' => __("To ensure the smooth and optimal functioning of our NETOPIA Payments wodpress plugin, it is imperative to have <br>
+                                                    an active `<b>Signature</b>` and at least one `<b>API Key</b>` These fundamental components are the backbone of our plugin's capabilities.</br></br>
+                                                    To get started, simply click on <b>Configuration</b> button, where you'll be prompted to enter your <b>Username</b> and <b>password</b> form NETOPIA paltform.<br>
+                                                    Once authenticated, the wizard will automatically return and configure your `<b>Signature</b>`, `<b>Livw API Key</b>` & `<b>Sandbox API Key</b>`<br><br>
+                                                    The `<b>Sandbox API Key</b>` is not obligatory but highly recommended. <br>
+                                                    It serves as a virtual playground, allowing you to thoroughly test your plugin implementation before moving into a production/live environment.", 'netopiapayments' ),
+                                                );
+                        
+            $this->form_fields['wizard_button'] = array(
+                                                    'title'             => __( 'Configuration!', 'netopiapayments' ),
+                                                    'type'              => 'button',
+                                                    'custom_attributes' => array(),
+                                                    'description'       => __( 'Configure your plugin for NETOPIA Payments Method automatically!', 'netopiapayments' ),
+                                                    'desc_tip'          => true,
+                                                );
+            // Add the feilds in hidden type
+            $this->form_fields['account_id'] = array(
+                                                    'title'        => __( 'Seller Account ID', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'Seller Account ID / Merchant POS identifier, is available in your NETOPIA account.', 'netopiapayments' ),
+                                                    'description'	=> __( 'Find it from NETOPIA Payments admin -> Seller Accounts -> Technical settings.', 'netopiapayments' ),
+                                                    'custom_attributes' => array('readonly' => 'readonly')
+                                                );
+            $this->form_fields['live_api_key'] = array(
+                                                    'title'        => __( 'Live API Key: ', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'In order to communicate with the payment API, you need a specific API KEY.', 'netopiapayments' ),
+                                                    'description' => __( 'Generate / Find it from NETOPIA Payments admin -> Profile -> Security', 'netopiapayments' ),
+                                                    'custom_attributes' => array('readonly' => 'readonly')
+                                                );
+            $this->form_fields['sandbox_api_key'] = array(
+                                                    'title'        => __( 'Sandbox API Key: ', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'In order to communicate with the payment API, you need a specific API KEY.', 'netopiapayments' ),
+                                                    'description' => __( 'Generate / Find it from NETOPIA Payments admin -> Profile -> Security', 'netopiapayments' ),
+                                                    'custom_attributes' => array('readonly' => 'readonly')
+                                                );
+
+            // To display Notify to Merchant
+            $this->form_fields['ntp_notify'] =  array(
+                                                    'title'       => '',
+                                                    'type'        => 'title',
+                                                    'description' => __("", 'netopiapayments' ),
+                                                );
+            $this->form_fields['ntp_notify_value'] = array(
+                                                    'title'             => __( '', 'netopiapayments' ),
+                                                    'type'              => 'hidden',
+                                                    'custom_attributes' => array(),
+                                                );
+        } else {
+            $this->form_fields['key_setting'] = array(
+                                                    'title'       => __( 'Seller Account', 'netopiapayments' ),
+                                                    'type'        => 'title',
+                                                    'description' => '',
+                                                );
+            $this->form_fields['account_id'] = array(
+                                                    'title'        => __( 'Seller Account ID', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'Seller Account ID / Merchant POS identifier, is available in your NETOPIA account.', 'netopiapayments' ),
+                                                    'description'	=> __( 'Find it from NETOPIA Payments admin -> Seller Accounts -> Technical settings.', 'netopiapayments' ),
+                                                );
+            $this->form_fields['live_api_key'] = array(
+                                                    'title'        => __( 'Live API Key: ', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'In order to communicate with the payment API, you need a specific API KEY.', 'netopiapayments' ),
+                                                    'description' => __( 'Generate / Find it from NETOPIA Payments admin -> Profile -> Security', 'netopiapayments' ),
+                                                );
+            $this->form_fields['sandbox_api_key'] = array(
+                                                    'title'        => __( 'Sandbox API Key: ', 'netopiapayments' ),
+                                                    'type'        => 'text',
+                                                    'desc_tip'    => __( 'In order to communicate with the payment API, you need a specific API KEY.', 'netopiapayments' ),
+                                                    'description' => __( 'Generate / Find it from NETOPIA Payments admin -> Profile -> Security', 'netopiapayments' ),
+                                                    );
+        }
+    }
+
+	/**
+     * Generate custom Button HTML in ADMIN.
+     */
+    public function generate_button_html( $key, $data ) {
+        $field    = $this->plugin_id . $this->id . '_' . $key;
+        $defaults = array(
+            'class'             => 'button-secondary',
+            'css'               => '',
+            'custom_attributes' => array(),
+            'desc_tip'          => false,
+            'description'       => '',
+            'title'             => '',
+        );
+
+        $data = wp_parse_args( $data, $defaults );
+
+        ob_start();
+        ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr( $field ); ?>"><?php echo wp_kses_post( $data['title'] ); ?></label>
+                <?php echo $this->get_tooltip_html( $data ); ?>
+            </th>
+            <td class="forminp">
+                <fieldset>
+                    <legend class="screen-reader-text"><span><?php echo wp_kses_post( $data['title'] ); ?></span></legend>
+                    <button class="<?php echo esc_attr( $data['class'] ); ?>" type="button" name="<?php echo esc_attr( $field ); ?>" id="<?php echo esc_attr( $field ); ?>" style="<?php echo esc_attr( $data['css'] ); ?>" <?php echo $this->get_custom_attribute_html( $data ); ?>><?php echo wp_kses_post( $data['title'] ); ?></button>
+                    <?php echo $this->get_description_html( $data ); ?>
+                </fieldset>
+            </td>
+        </tr>
+        <?php
+        return ob_get_clean();
+    }
+
+	/**
+	 * Old Admin Form - Temporary keep
+	 */
+	// // Build the administration fields for this specific Gateway
+	// public function init_form_fields() {
+	// 	$this->form_fields = array(			
+	// 		'enabled' => array(
+	// 			'title'		=> __( 'Enable / Disable', 'netopiapayments' ),
+	// 			'label'		=> __( 'Enable this payment gateway', 'netopiapayments' ),
+	// 			'type'		=> 'checkbox',
+	// 			'default'	=> 'no',
+	// 		),
+	// 		'environment' => array(
+	// 			'title'		=> __( 'NETOPIA Payments Test Mode', 'netopiapayments' ),
+	// 			'label'		=> __( 'Enable Test Mode', 'netopiapayments' ),
+	// 			'type'		=> 'checkbox',
+	// 			'description' => __( 'Place the payment gateway in test mode.', 'netopiapayments' ),
+	// 			'default'	=> 'no',
+	// 		),
+	// 		'title' => array(
+	// 			'title'		=> __( 'Title', 'netopiapayments' ),
+	// 			'type'		=> 'text',
+	// 			'desc_tip'	=> __( 'Payment title the customer will see during the checkout process.', 'netopiapayments' ),
+	// 			'default'	=> __( 'NETOPIA Payments', 'netopiapayments' ),
+	// 		),
+	// 		'description' => array(
+	// 			'title'		=> __( 'Description', 'netopiapayments' ),
+	// 			'type'		=> 'textarea',
+	// 			'desc_tip'	=> __( 'Payment description the customer will see during the checkout process.', 'netopiapayments' ),
+	// 			'css'		=> 'max-width:350px;',
+	// 		),
+	// 		'default_status' => array(
+	// 			'title'		=> __( 'Default status', 'netopiapayments' ),
+	// 			'type'		=> 'select',
+	// 			'desc_tip'	=> __( 'Default status of transaction.', 'netopiapayments' ),
+	// 			'default'	=> 'processing',
+	// 			'options' => array(
+	// 				'completed' => __('Completed'),
+	// 				'processing' => __('Processing'),
+	// 			),
+	// 			'css'		=> 'max-width:350px;',
+	// 		),
+	// 		'key_setting' => array(
+    //             'title'       => __( 'Login to Netopia and go to Admin-> Conturi de comerciant->Modifica (iconita creionas)->tab-ul Setari securitate', 'netopiapayments' ),
+    //             'type'        => 'title',
+    //             'description' => '',
+    //         ),
+	// 		'account_id' => array(
+	// 			'title'		=> __( 'Seller Account ID', 'netopiapayments' ),
+	// 			'type'		=> 'text',
+	// 			'desc_tip'	=> __( 'This is Account ID provided by Netopia when you signed up for an account. Unique key for your seller account for the payment process.', 'netopiapayments' ),
+	// 		),
+    //         'live_cer' => array(
+    //             'title'		=> __( 'Live public key: ', 'netopiapayments' ),
+    //             'type'		=> 'file',
+    //             'desc_tip'	=> is_null($this->get_option('live_cer')) ?  __( 'Download the Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_cer'),
+    //         ),
+    //         'live_key' => array(
+    //             'title'		=> __( 'Live private key: ', 'netopiapayments' ),
+    //             'type'		=> 'file',
+    //             'desc_tip'	=> is_null($this->get_option('live_key')) ? __( 'Download the Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_key'),
+    //         ),
+    //         'sandbox_cer' => array(
+    //             'title'		=> __( 'Sandbox public key: ', 'netopiapayments' ),
+    //             'type'		=> 'file',
+    //             'desc_tip'	=> is_null($this->get_option('sandbox_cer')) ? __( 'Download the Sandbox Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_cer'),
+    //         ),
+    //         'sandbox_key' => array(
+    //             'title'		=> __( 'Sandbox private key: ', 'netopiapayments' ),
+    //             'type'		=> 'file',
+    //             'desc_tip'	=> is_null($this->get_option('sandbox_key')) ? __( 'Download the Sandbox Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_key'),
+    //         ),
+	// 		'payment_methods'   => array(
+	// 	        'title'       => __( 'Payment methods', 'netopiapayments' ),
+	// 	        'type'        => 'multiselect',
+	// 	        'description' => __( 'Select which payment methods to accept.', 'netopiapayments' ),
+	// 	        'default'     => '',
+	// 	        'options'     => array(
+	// 	          'credit_card'	      => __( 'Credit Card', 'netopiapayments' ),
+	// 	          'sms'			        => __('SMS' , 'netopiapayments' ),
+	// 	          'bank_transfer'		      => __( 'Bank Transfer', 'netopiapayments' ),
+	// 	          'bitcoin'  => __( 'Bitcoin', 'netopiapayments' )
+	// 	          ),
+	// 	    ),	
+	// 		'sms_setting' => array(
+	// 			'title'       => __( 'For SMS Payment', 'netopiapayments' ),
+	// 			'type'        => 'title',
+	// 			'description' => '',
+	// 		),	
+	// 		'service_id' => array(
+	// 			'title'		=> __( 'Product/service code: ', 'netopiapayments' ),
+	// 			'type'		=> 'text',
+	// 			'desc_tip'	=> __( 'This is Service Code provided by Netopia when you signed up for an account.', 'netopiapayments' ),
+	// 			'description' => __( 'Login to Netopia and go to Admin -> Conturi de comerciant -> Produse si servicii -> Semnul plus', 'netopiapayments' ),
+	// 		),
+	// 	);		
+	// }
 
 	function payment_fields() {
 		// Description of payment method from settings

@@ -1,4 +1,5 @@
 <?php
+// For Version Api V2
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -192,7 +193,7 @@ class netopiapayments extends WC_Payment_Gateway {
     }
 
     /**
-     * Generate Button HTML.
+     * Generate custom Button HTML in ADMIN.
      */
     public function generate_button_html( $key, $data ) {
         $field    = $this->plugin_id . $this->id . '_' . $key;

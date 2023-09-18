@@ -1,13 +1,18 @@
 var ntpNotify = netopiaUIPath_data.ntp_notify;
-    
+var ntpShopConfig = "http://localhost/shopConfiguration/";
+
 document.addEventListener('DOMContentLoaded', function() {
     var popupLink = document.getElementById('woocommerce_netopiapayments_wizard_button');
     document.getElementById('woocommerce_netopiapayments_ntp_notify').innerHTML= ntpNotify;
     popupLink.addEventListener('click', function(e) {
-        var netopiaUIPath_dataPluginUrl = netopiaUIPath_data.plugin_url;
+        // var netopiaUIPath_dataPluginUrl = netopiaUIPath_data.plugin_url;
         var netopiaUIPath_dataSiteUrl = netopiaUIPath_data.site_url;
+        var pluginCallback = netopiaUIPath_dataSiteUrl+'/index.php/wp-json/netopiapayments/v1/updatecredential/';
+        
+
       e.preventDefault();
-      openPopupWindow(netopiaUIPath_dataSiteUrl + netopiaUIPath_dataPluginUrl+'v2/view/login.php', 'Popup Form', 700, 700);
+      // openPopupWindow(netopiaUIPath_dataSiteUrl + netopiaUIPath_dataPluginUrl+'v2/view/login.php', 'Popup Form', 700, 700);
+      openPopupWindow(ntpShopConfig+'?callback='+pluginCallback, 'Popup Form', 700, 700);
     });
   });
   
