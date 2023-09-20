@@ -37,6 +37,14 @@ function updateCredentialCallback($request)
     
     // Get the request parameters
     $params = $request->get_params();
+
+    if (!is_array($params) || empty($params)) {
+        wp_send_json([
+            'code' => 400,
+            'message' => "Credential are not updated!. The Request is empty!",
+            'timestamp' => time(),
+        ]);        
+    }
     
     // Retrieve and process data
     $data = array(

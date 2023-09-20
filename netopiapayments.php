@@ -75,6 +75,7 @@ function netopiapayments_init() {
 
         // If we made it this far, then include our Gateway Class
         include_once( 'v2/wc-netopiapayments-gateway.php' );
+        include_once( 'wc-netopiapayments-update-key.php' );
         // include_once( 'v2/wc-netopiapayments-auth.php' );
 
         add_action( 'admin_enqueue_scripts', 'netopiapaymentsjs_init' );
