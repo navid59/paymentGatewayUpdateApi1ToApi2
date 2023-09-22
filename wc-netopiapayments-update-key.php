@@ -23,7 +23,18 @@ function netopiaCustomEndpoint()
         'callback' => 'updateCredentialCallback',
         'permission_callback' => '__return_true'
     ));
+
+    // Add CORS headers
+    // add_action('rest_pre_serve_request', 'add_cors_headers');
 }
+
+
+// Define a callback function to add CORS headers
+// function add_cors_headers() {
+//     header("Access-Control-Allow-Origin: *"); // Change * to your desired origin(s) if needed
+//     header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+//     header("Access-Control-Allow-Headers: Content-Type, Authorization");
+// }
 
 
 // Callback function to update credentials

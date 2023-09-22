@@ -1,6 +1,7 @@
 var ntpNotify = netopiaUIPath_data.ntp_notify;
 // var ntpShopConfig = "https://shop-config-fqvtst6pfa-ew.a.run.app";
 var ntpShopConfig = "http://shopconfig.navid.ro/";
+// var ntpShopConfig = "http://localhost/shopConfiguration/";
 
 document.addEventListener('DOMContentLoaded', function() {
     var popupLink = document.getElementById('woocommerce_netopiapayments_wizard_button');
