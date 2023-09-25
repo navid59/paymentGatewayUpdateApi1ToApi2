@@ -144,3 +144,47 @@ register_activation_hook( __FILE__, 'plugin_activated' );
 function plugin_activated(){
 	add_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
 }
+
+/**
+ * Verify Ceredential Keys on Upgrade Plugin
+ */
+// function isPluginUpgradeCompleted($upgrader_object, $options) {
+//     echo "<pre>";
+//     var_dump($options);
+//     echo "<hr>";
+//     var_dump($upgrader_object);
+//     echo "</pre>";
+//     die(1);
+//     // Check if the upgrade process was for your plugin
+//     if ($options['action'] == 'update' && $options['type'] == 'plugin' && in_array('netopia-payments-payment-gateway/netopiapayments.php', $options['plugins'])) {
+//         // Your custom code to run after the plugin upgrade here
+//         // Replace 'your-plugin-folder/your-plugin-file.php' with your plugin's folder and main file.
+//     }
+// }
+
+// add_action('upgrader_process_complete', 'isPluginUpgradeCompleted', 10, 2);
+
+// Check for upgrades after plugin installation or upgrade
+// function my_plugin_check_for_upgrade($response, $hook_extra, $result) {
+//     echo "<pre>";
+//     echo "response <br>";var_dump($response);
+//     echo "hook_extra <br>";var_dump($hook_extra);
+//     echo "result <br>";var_dump($result);
+//     echo "</pre>";
+//     // die(1);
+//     // if ($hook_extra['type'] === 'plugin' && isset($hook_extra['plugin'])) {
+//     //     // Get the plugin folder and main file from hook_extra
+//     //     $plugin_folder = dirname($hook_extra['plugin']);
+//     //     $plugin_file = basename($hook_extra['plugin']);
+
+//     //     if ($result === true && $hook_extra['action'] === 'update') {
+//     //         // Upgrade-specific code here
+//     //         // For example, you can update database tables or settings.
+//     //         // This code will execute only when an existing plugin is upgraded.
+//     //     }
+//     // }
+// }
+
+// add_action('upgrader_post_install', 'my_plugin_check_for_upgrade', 10, 3);
+
+

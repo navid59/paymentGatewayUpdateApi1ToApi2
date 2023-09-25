@@ -364,8 +364,13 @@ class netopiapayments extends WC_Payment_Gateway {
          /** - Order section  */
         $orderData = new \StdClass();
 		
-        $orderData->description             = "Wordpress - api2 - plugin_". rand(1000,9999);
-        $orderData->orderID                 = $customer_order->get_order_number();
+        /**
+         * Set a custom Order description
+         */
+        $customPaymentDescription = 'Plata pentru comanda cu ID: '.$customer_order->get_order_number().' | '.$customer_order->payment_method_title.' | '.$customer_order->get_billing_first_name() .' '.$customer_order->get_billing_last_name();
+
+        $orderData->description             = $customPaymentDescription;
+        $orderData->orderID                 = $customer_order->get_order_number().'_'.$this->randomUniqueIdentifier();
         $orderData->amount                  = $customer_order->get_total();
         $orderData->currency                = $customer_order->get_currency();
 
@@ -619,5 +624,17 @@ class netopiapayments extends WC_Payment_Gateway {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 
+     */
+    public function randomUniqueIdentifier() {
+        $microtime = microtime();
+        list($usec, $sec) = explode(" ", $microtime);
+        $seed = (int)($sec * 1000000 + $usec);
+        srand($seed);
+        $randomUniqueIdentifier = md5(uniqid(rand(), true));
+        return $randomUniqueIdentifier;
     }
 }
