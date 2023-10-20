@@ -54,12 +54,9 @@ class netopiapayments extends WC_Payment_Gateway {
 				}	
 			}
 
-		// Set Ceredential status Upgrade Plugin
+		// set schedule to verify Ceredential keys on Upgrade Plugin
 		add_action('upgrader_process_complete', 'setUpgradeStatus', 10, 2);
 		}
-
-		// Call verify Ceredential Keys on Upgrade Plugin
-		// add_action('upgrader_process_complete', 'isPluginUpgradeCompleted', 10, 2);
 		
 		add_action('woocommerce_receipt_netopiapayments', array(&$this, 'receipt_page'));
 	} 	
