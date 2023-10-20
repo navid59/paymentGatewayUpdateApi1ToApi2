@@ -5,7 +5,7 @@ Plugin Name: NETOPIA Payments Payment Gateway
 Plugin URI: https://www.netopia-payments.ro
 Description: accept payments through NETOPIA Payments
 Author: Netopia
-Version: 1.5
+Version: 1.7
 License: GPLv2
 */
 
@@ -146,75 +146,69 @@ function plugin_activated(){
 }
 
 /**
+ * Update netopiapayments_certifications to be verify and regenerate keys, if is neccessary
+ */
+function setUpgradeStatus($upgrader_object, $options) {
+    update_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
+}
+
+/**
  * Verify Ceredential Keys on Upgrade Plugin
  */
-function isPluginUpgradeCompleted($upgrader_object, $options) {
-    // Check if the upgrade process was for your plugin
-    echo "<pre>";
-   
-    // echo "upgrader_object : <br>";
-    // var_dump($upgrader_object);
-    // echo "<hr>";
-    // var_dump($this->account_id);
-    // echo "<hr>";
-    // var_dump($upgrader_object->strings);
-    
-    echo "</pre>";
+// function isPluginUpgradeCompleted($upgrader_object, $options) {
+//     // Check if the upgrade process was for your plugin
+//     // Get netopia setting
+//     $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
+//     echo "</hr>NTP Options : <pre>";
+//     var_dump($ntpOptions);
+//     echo "</pre></hr>";
 
-    // Get netopia setting
-    $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
-    echo "</hr>NTP Options : <pre>";
-    var_dump($ntpOptions);
-    echo "</pre></hr>";
+//     if ($options['action'] == 'install' && $options['type'] == 'plugin') {
+//         echo "C1 - options : <br>";
+//         var_dump($options);
+//         echo "<hr>";
+//         $upgradedByNtpZipFile = strpos($upgrader_object->skin->options['title'], "netopia-payments-payment-gateway.zip");
+//         echo "C2 : <br>";
+//         echo $upgrader_object->skin->options['title']."<br>";
+//         echo "upgradedByNtpZipFile ->  ".$upgradedByNtpZipFile ."<br>";
+//         echo "upgrader_object->skin->options[overwrite] ->  ".$upgrader_object->skin->options['overwrite'] ."<br>";
+//         if ($upgradedByNtpZipFile !== false && $upgrader_object->skin->options['overwrite'] == "update-plugin") {
+//             echo "Plugin OVERWRITE<br>";
+//             var_dump($upgrader_object->skin->options);
+//             // Call regenerate function 
+//             if($ntpOptions['account_id']) {	
+//                 echo "<hr><pre>";
+//                 var_dump($ntpOptions);
+//                 echo "</pre>";
+//                 echo "Account ID : ".$ntpOptions['account_id']."<br>";
+//                 certificateVerifyRegenerate2TEST($ntpOptions['account_id']);
+//             }
+//         }
+//     }
+// }
 
-    if ($options['action'] == 'install' && $options['type'] == 'plugin') {
-        echo "C1 - options : <br>";
-        var_dump($options);
-        echo "<hr>";
-        $upgradedByNtpZipFile = strpos($upgrader_object->skin->options['title'], "netopia-payments-payment-gateway.zip");
-        echo "C2 : <br>";
-        echo $upgrader_object->skin->options['title']."<br>";
-        echo "upgradedByNtpZipFile ->  ".$upgradedByNtpZipFile ."<br>";
-        echo "upgrader_object->skin->options[overwrite] ->  ".$upgrader_object->skin->options['overwrite'] ."<br>";
-        if ($upgradedByNtpZipFile !== false && $upgrader_object->skin->options['overwrite'] == "update-plugin") {
-            echo "Plugin OVERWRITE<br>";
-            var_dump($upgrader_object->skin->options);
-            // Call regenerate function 
-            if($ntpOptions['account_id']) {	
-                echo "<hr><pre>";
-                var_dump($ntpOptions);
-                echo "</pre>";
-                echo "Account ID : ".$ntpOptions['account_id']."<br>";
-                certificateVerifyRegenerate2TEST($ntpOptions['account_id']);
-            }
-        }
-    }
-}
-
-// add_action('upgrader_process_complete', 'isPluginUpgradeCompleted', 10, 2);
-
-function certificateVerifyRegenerate2TEST($account_id) {	
-    $map = plugin_dir_path( __FILE__ ).'netopia/certificate/';			
-    $arr = [	
-        'sandbox_cer_content' => 'sandbox.'.$account_id.'.public.cer',	
-        'sandbox_key_content' => 'sandbox.'.$account_id.'private.key',	
-        'live_cer_content' => 'live.'.$account_id.'.public.cer',	
-        'live_key_content' => 'live.'.$account_id.'private.key'	
-    ];	
-    foreach($arr as $key => $value) {	
-        $fName = $map.$value;	
-        if (file_exists($fName)) {	
-            break;	
-        } else {	
-            $keyContent = get_option('woocommerce_netopiapayments_'.$key, false);	
-            if ($keyContent) {	
-                if(file_put_contents($fName, $keyContent)) {	
-                    chmod($fName, 0444);	
-                }						
-            }	
-        }	
-    }	
-}
+// function certificateVerifyRegenerate2TEST($account_id) {	
+//     $map = plugin_dir_path( __FILE__ ).'netopia/certificate/';			
+//     $arr = [	
+//         'sandbox_cer_content' => 'sandbox.'.$account_id.'.public.cer',	
+//         'sandbox_key_content' => 'sandbox.'.$account_id.'private.key',	
+//         'live_cer_content' => 'live.'.$account_id.'.public.cer',	
+//         'live_key_content' => 'live.'.$account_id.'private.key'	
+//     ];	
+//     foreach($arr as $key => $value) {	
+//         $fName = $map.$value;	
+//         if (file_exists($fName)) {	
+//             break;	
+//         } else {	
+//             $keyContent = get_option('woocommerce_netopiapayments_'.$key, false);	
+//             if ($keyContent) {	
+//                 if(file_put_contents($fName, $keyContent)) {	
+//                     chmod($fName, 0444);	
+//                 }						
+//             }	
+//         }	
+//     }	
+// }
 
 
 
