@@ -5,7 +5,7 @@ Plugin Name: NETOPIA Payments Payment Gateway
 Plugin URI: https://www.netopia-payments.ro
 Description: accept payments through NETOPIA Payments
 Author: Netopia
-Version: 1.3+1
+Version: 1.5
 License: GPLv2
 */
 
@@ -148,43 +148,73 @@ function plugin_activated(){
 /**
  * Verify Ceredential Keys on Upgrade Plugin
  */
-// function isPluginUpgradeCompleted($upgrader_object, $options) {
-//     echo "<pre>";
-//     var_dump($options);
-//     echo "<hr>";
-//     var_dump($upgrader_object);
-//     echo "</pre>";
-//     die(1);
-//     // Check if the upgrade process was for your plugin
-//     if ($options['action'] == 'update' && $options['type'] == 'plugin' && in_array('netopia-payments-payment-gateway/netopiapayments.php', $options['plugins'])) {
-//         // Your custom code to run after the plugin upgrade here
-//         // Replace 'your-plugin-folder/your-plugin-file.php' with your plugin's folder and main file.
-//     }
-// }
+function isPluginUpgradeCompleted($upgrader_object, $options) {
+    // Check if the upgrade process was for your plugin
+    echo "<pre>";
+   
+    // echo "upgrader_object : <br>";
+    // var_dump($upgrader_object);
+    // echo "<hr>";
+    // var_dump($this->account_id);
+    // echo "<hr>";
+    // var_dump($upgrader_object->strings);
+    
+    echo "</pre>";
+
+    // Get netopia setting
+    $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
+    echo "</hr>NTP Options : <pre>";
+    var_dump($ntpOptions);
+    echo "</pre></hr>";
+
+    if ($options['action'] == 'install' && $options['type'] == 'plugin') {
+        echo "C1 - options : <br>";
+        var_dump($options);
+        echo "<hr>";
+        $upgradedByNtpZipFile = strpos($upgrader_object->skin->options['title'], "netopia-payments-payment-gateway.zip");
+        echo "C2 : <br>";
+        echo $upgrader_object->skin->options['title']."<br>";
+        echo "upgradedByNtpZipFile ->  ".$upgradedByNtpZipFile ."<br>";
+        echo "upgrader_object->skin->options[overwrite] ->  ".$upgrader_object->skin->options['overwrite'] ."<br>";
+        if ($upgradedByNtpZipFile !== false && $upgrader_object->skin->options['overwrite'] == "update-plugin") {
+            echo "Plugin OVERWRITE<br>";
+            var_dump($upgrader_object->skin->options);
+            // Call regenerate function 
+            if($ntpOptions['account_id']) {	
+                echo "<hr><pre>";
+                var_dump($ntpOptions);
+                echo "</pre>";
+                echo "Account ID : ".$ntpOptions['account_id']."<br>";
+                certificateVerifyRegenerate2TEST($ntpOptions['account_id']);
+            }
+        }
+    }
+}
 
 // add_action('upgrader_process_complete', 'isPluginUpgradeCompleted', 10, 2);
 
-// Check for upgrades after plugin installation or upgrade
-// function my_plugin_check_for_upgrade($response, $hook_extra, $result) {
-//     echo "<pre>";
-//     echo "response <br>";var_dump($response);
-//     echo "hook_extra <br>";var_dump($hook_extra);
-//     echo "result <br>";var_dump($result);
-//     echo "</pre>";
-//     // die(1);
-//     // if ($hook_extra['type'] === 'plugin' && isset($hook_extra['plugin'])) {
-//     //     // Get the plugin folder and main file from hook_extra
-//     //     $plugin_folder = dirname($hook_extra['plugin']);
-//     //     $plugin_file = basename($hook_extra['plugin']);
+function certificateVerifyRegenerate2TEST($account_id) {	
+    $map = plugin_dir_path( __FILE__ ).'netopia/certificate/';			
+    $arr = [	
+        'sandbox_cer_content' => 'sandbox.'.$account_id.'.public.cer',	
+        'sandbox_key_content' => 'sandbox.'.$account_id.'private.key',	
+        'live_cer_content' => 'live.'.$account_id.'.public.cer',	
+        'live_key_content' => 'live.'.$account_id.'private.key'	
+    ];	
+    foreach($arr as $key => $value) {	
+        $fName = $map.$value;	
+        if (file_exists($fName)) {	
+            break;	
+        } else {	
+            $keyContent = get_option('woocommerce_netopiapayments_'.$key, false);	
+            if ($keyContent) {	
+                if(file_put_contents($fName, $keyContent)) {	
+                    chmod($fName, 0444);	
+                }						
+            }	
+        }	
+    }	
+}
 
-//     //     if ($result === true && $hook_extra['action'] === 'update') {
-//     //         // Upgrade-specific code here
-//     //         // For example, you can update database tables or settings.
-//     //         // This code will execute only when an existing plugin is upgraded.
-//     //     }
-//     // }
-// }
-
-// add_action('upgrader_post_install', 'my_plugin_check_for_upgrade', 10, 3);
 
 
