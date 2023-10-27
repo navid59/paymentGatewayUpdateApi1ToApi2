@@ -226,103 +226,7 @@ class netopiapayments extends WC_Payment_Gateway {
         return ob_get_clean();
     }
 
-	/**
-	 * Old Admin Form - Temporary keep
-	 */
-	// // Build the administration fields for this specific Gateway
-	// public function init_form_fields() {
-	// 	$this->form_fields = array(			
-	// 		'enabled' => array(
-	// 			'title'		=> __( 'Enable / Disable', 'netopiapayments' ),
-	// 			'label'		=> __( 'Enable this payment gateway', 'netopiapayments' ),
-	// 			'type'		=> 'checkbox',
-	// 			'default'	=> 'no',
-	// 		),
-	// 		'environment' => array(
-	// 			'title'		=> __( 'NETOPIA Payments Test Mode', 'netopiapayments' ),
-	// 			'label'		=> __( 'Enable Test Mode', 'netopiapayments' ),
-	// 			'type'		=> 'checkbox',
-	// 			'description' => __( 'Place the payment gateway in test mode.', 'netopiapayments' ),
-	// 			'default'	=> 'no',
-	// 		),
-	// 		'title' => array(
-	// 			'title'		=> __( 'Title', 'netopiapayments' ),
-	// 			'type'		=> 'text',
-	// 			'desc_tip'	=> __( 'Payment title the customer will see during the checkout process.', 'netopiapayments' ),
-	// 			'default'	=> __( 'NETOPIA Payments', 'netopiapayments' ),
-	// 		),
-	// 		'description' => array(
-	// 			'title'		=> __( 'Description', 'netopiapayments' ),
-	// 			'type'		=> 'textarea',
-	// 			'desc_tip'	=> __( 'Payment description the customer will see during the checkout process.', 'netopiapayments' ),
-	// 			'css'		=> 'max-width:350px;',
-	// 		),
-	// 		'default_status' => array(
-	// 			'title'		=> __( 'Default status', 'netopiapayments' ),
-	// 			'type'		=> 'select',
-	// 			'desc_tip'	=> __( 'Default status of transaction.', 'netopiapayments' ),
-	// 			'default'	=> 'processing',
-	// 			'options' => array(
-	// 				'completed' => __('Completed'),
-	// 				'processing' => __('Processing'),
-	// 			),
-	// 			'css'		=> 'max-width:350px;',
-	// 		),
-	// 		'key_setting' => array(
-    //             'title'       => __( 'Login to Netopia and go to Admin-> Conturi de comerciant->Modifica (iconita creionas)->tab-ul Setari securitate', 'netopiapayments' ),
-    //             'type'        => 'title',
-    //             'description' => '',
-    //         ),
-	// 		'account_id' => array(
-	// 			'title'		=> __( 'Seller Account ID', 'netopiapayments' ),
-	// 			'type'		=> 'text',
-	// 			'desc_tip'	=> __( 'This is Account ID provided by Netopia when you signed up for an account. Unique key for your seller account for the payment process.', 'netopiapayments' ),
-	// 		),
-    //         'live_cer' => array(
-    //             'title'		=> __( 'Live public key: ', 'netopiapayments' ),
-    //             'type'		=> 'file',
-    //             'desc_tip'	=> is_null($this->get_option('live_cer')) ?  __( 'Download the Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_cer'),
-    //         ),
-    //         'live_key' => array(
-    //             'title'		=> __( 'Live private key: ', 'netopiapayments' ),
-    //             'type'		=> 'file',
-    //             'desc_tip'	=> is_null($this->get_option('live_key')) ? __( 'Download the Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('live_key'),
-    //         ),
-    //         'sandbox_cer' => array(
-    //             'title'		=> __( 'Sandbox public key: ', 'netopiapayments' ),
-    //             'type'		=> 'file',
-    //             'desc_tip'	=> is_null($this->get_option('sandbox_cer')) ? __( 'Download the Sandbox Certificat digital mobilPay™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_cer'),
-    //         ),
-    //         'sandbox_key' => array(
-    //             'title'		=> __( 'Sandbox private key: ', 'netopiapayments' ),
-    //             'type'		=> 'file',
-    //             'desc_tip'	=> is_null($this->get_option('sandbox_key')) ? __( 'Download the Sandbox Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_key'),
-    //         ),
-	// 		'payment_methods'   => array(
-	// 	        'title'       => __( 'Payment methods', 'netopiapayments' ),
-	// 	        'type'        => 'multiselect',
-	// 	        'description' => __( 'Select which payment methods to accept.', 'netopiapayments' ),
-	// 	        'default'     => '',
-	// 	        'options'     => array(
-	// 	          'credit_card'	      => __( 'Credit Card', 'netopiapayments' ),
-	// 	          'sms'			        => __('SMS' , 'netopiapayments' ),
-	// 	          'bank_transfer'		      => __( 'Bank Transfer', 'netopiapayments' ),
-	// 	          'bitcoin'  => __( 'Bitcoin', 'netopiapayments' )
-	// 	          ),
-	// 	    ),	
-	// 		'sms_setting' => array(
-	// 			'title'       => __( 'For SMS Payment', 'netopiapayments' ),
-	// 			'type'        => 'title',
-	// 			'description' => '',
-	// 		),	
-	// 		'service_id' => array(
-	// 			'title'		=> __( 'Product/service code: ', 'netopiapayments' ),
-	// 			'type'		=> 'text',
-	// 			'desc_tip'	=> __( 'This is Service Code provided by Netopia when you signed up for an account.', 'netopiapayments' ),
-	// 			'description' => __( 'Login to Netopia and go to Admin -> Conturi de comerciant -> Produse si servicii -> Semnul plus', 'netopiapayments' ),
-	// 		),
-	// 	);		
-	// }
+	
 
 	function payment_fields() {
 		// Description of payment method from settings
@@ -384,7 +288,9 @@ class netopiapayments extends WC_Payment_Gateway {
   		<?php
   	}
 
-  	// Submit payment
+  	/** 
+    * Submit payment
+    * */ 
 	public function process_payment( $order_id ) {
 		global $woocommerce;		
 		$order = new WC_Order( $order_id );			
@@ -411,7 +317,9 @@ class netopiapayments extends WC_Payment_Gateway {
         	);
     }
 
-	// Validate fields
+	/**
+	 * Validate fields
+	 **/ 
 	public function validate_fields() {
 		$method_pay            = $this->get_post( 'netopia_method_pay' );
 		// Check card number
@@ -836,17 +744,6 @@ class netopiapayments extends WC_Payment_Gateway {
 			return $_REQUEST[ $name ];
 		}
 		return null;
-	}
-
-	public function ntpLog($contents){	
-		$file = dirname(__FILE__).'/ntpDebugging_'.date('y-m-d').'.txt';	
-		
-		if (is_array($contents))
-			$contents = var_export($contents, true);	
-		else if (is_object($contents))
-			$contents = json_encode($contents);
-			
-		file_put_contents($file, date('m-d H:i:s').$contents."\n", FILE_APPEND);
 	}
 
     public function process_admin_options() {

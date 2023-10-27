@@ -5,7 +5,7 @@ Plugin Name: NETOPIA Payments Payment Gateway
 Plugin URI: https://www.netopia-payments.ro
 Description: accept payments through NETOPIA Payments
 Author: Netopia
-Version: 1.8
+Version: 1.6
 License: GPLv2
 */
 
@@ -42,6 +42,7 @@ function netopiapayments_init() {
         return array_merge( $plugin_links, $links );
     }
 
+
     if (getNtpApiVer() == 1) {
         // If we made it this far, then include our Gateway Class
         include_once( 'wc-netopiapayments-gateway.php' );
@@ -53,10 +54,6 @@ function netopiapayments_init() {
             if ( 'woocommerce_page_wc-settings' != $hook ) {
                     return;
                 }
-                // wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'js/netopiapayments_.js',array('jquery'),'2.0' ,true);
-                // wp_enqueue_script( 'netopiatoastrjs', plugin_dir_url( __FILE__ ) . 'js/toastr.min.js',array(),'2.0' ,true);
-                // wp_enqueue_style('netopiatoastrcss', plugin_dir_url( __FILE__ ) . 'css/toastr.min.css',array(),'2.0' ,false);
-                 
                 // Get ntp_notify_value if exist
                  $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
                  $ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
@@ -66,6 +63,7 @@ function netopiapayments_init() {
                  wp_localize_script( 'netopiaUIjs', 'netopiaUIPath_data', array(
                      'plugin_url' => getAbsoulutFilePath(),
                      'site_url' => get_site_url(),
+                     'sKey' => base64_encode(md5(json_encode($ntpOptions).json_encode(get_home_url()))),
                      'ntp_notify' => $ntpNotify,
                      )
                  );
@@ -94,6 +92,7 @@ function netopiapayments_init() {
                 wp_localize_script( 'netopiaUIjs', 'netopiaUIPath_data', array(
                     'plugin_url' => getAbsoulutFilePath(),
                     'site_url' => get_site_url(),
+                    'sKey' => base64_encode(md5(json_encode($ntpOptions).json_encode(get_home_url()))),
                     'ntp_notify' => $ntpNotify,
                     )
                 );
