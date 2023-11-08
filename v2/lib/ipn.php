@@ -65,15 +65,10 @@ class IPN extends Request{
      */
     public function verifyIPN() {
 
-        /**
-        * Default IPN response, 
-        * will change if there is any problem
-        */
-        $outputData = array(
-            'errorType'		=> self::ERROR_TYPE_NONE,
-            'errorCode' 	=> null,
-            'errorMessage'	=> ''
-        );
+        if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') != 0){
+            echo 'invalid request method for payment confirmation' . PHP_EOL;
+            exit;
+		}
 
         /**
         *  Fetch all HTTP request headers
@@ -203,8 +198,17 @@ class IPN extends Request{
         
             try
                 {
+                /**
+                 * Decode the payload
+                 */
                 $objIpn = json_decode($payload, false);
-                // hear, can make Log for $objIpn
+
+                // fetch OrderId , amount & currency from request payload 
+                $outputData['data']['ntpID']    = $objIpn->payment->ntpID;
+                $outputData['data']['orderID']  = $objIpn->order->orderID;
+                $outputData['data']['amount']   = $objIpn->payment->amount;
+                $outputData['data']['currency'] = $objIpn->payment->currency;
+                $outputData['data']['status'] = $objIpn->payment->status;
                 }
             catch(\Exception $e)
                 {
@@ -224,7 +228,7 @@ class IPN extends Request{
                     /**
                      * payment was confirmed; deliver goods
                      */
-                    $outputData['errorMessage']	= "payment was confirmed; deliver goods";
+                    $outputData['errorMessage']	= "payment was paid; deliver goods";
                 break;
                 case self::STATUS_CANCELED: // void
                     /**
@@ -250,6 +254,14 @@ class IPN extends Request{
                     $outputData['errorCode']	= self::STATUS_FRAUD;
                     $outputData['errorMessage']	= "Payment in reviwing";
                 break;
+                case self::STATUS_PENDING_AUTH: // in review
+                    /**
+                     * payment status is in reviwing
+                     */
+                    $outputData['errorType']	= self::ERROR_TYPE_TEMPORARY;
+                    $outputData['errorCode']	= self::STATUS_PENDING_AUTH;
+                    $outputData['errorMessage']	= "Payment in reviwing";
+                break;
                 case self::STATUS_3D_AUTH:
                     /**
                      * In STATUS_3D_AUTH the paid purchase need to be authenticate by bank
@@ -269,6 +281,7 @@ class IPN extends Request{
                     /**
                      * STATUS_NEW
                      */
+                    $outputData['errorType']	= self::ERROR_TYPE_NONE;
                     $outputData['errorCode']	= self::STATUS_NEW;
                     $outputData['errorMessage']	= "STATUS_NEW";
                 break;
@@ -284,7 +297,6 @@ class IPN extends Request{
                     /**
                      * payment was confirmed; deliver goods
                      */
-                    $outputData['errorCode']	= self::STATUS_CONFIRMED;
                     $outputData['errorMessage']	= "payment was confirmed; deliver goods";
                 break;
                 case self::STATUS_PENDING:
@@ -418,12 +430,6 @@ class IPN extends Request{
             $outputData['errorType']	= self::ERROR_TYPE_PERMANENT;
             $outputData['errorCode']	= ($e->getCode() != 0) ? $e->getCode() : self::E_VERIFICATION_FAILED_GENERAL;
             $outputData['errorMessage']	= $e->getMessage();
-            
-            // $setRealTimeLog = [
-            //                 "IPN - Error"  =>  "Hash Data is not matched with subject",
-            //                 "ipnMsgError"  => 'ERROR_TYPE_PERMANENT -> E_VERIFICATION_FAILED_GENERAL'
-            //                 ];
-            // hear, can make Log for $setRealTimeLog;
         }
 
         return $outputData;
