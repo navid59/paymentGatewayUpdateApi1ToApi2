@@ -55,8 +55,12 @@ function netopiapayments_init() {
                     return;
                 }
                 // Get ntp_notify_value if exist
+				 $ntpNotify = '';
                  $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
-                 $ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
+				 if($ntpOptions) {
+					$ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
+				 }
+                 
  
                  wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiapayments.js',array('jquery'),'1.1' ,true);
                  wp_enqueue_script( 'netopiaUIjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiaCustom.js',array(),'1.2' ,true);
@@ -84,8 +88,12 @@ function netopiapayments_init() {
 
                 
                 // Get ntp_notify_value if exist
+				$ntpNotify = '';
                 $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
-                $ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
+				if($ntpOptions) {
+					$ntpNotify = array_key_exists('ntp_notify_value', $ntpOptions) ? $ntpOptions['ntp_notify_value'] : '';
+				}
+                
 
                 wp_enqueue_script( 'netopiapaymentsjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiapayments.js',array('jquery'),'1.0' ,true);
                 wp_enqueue_script( 'netopiaUIjs', plugin_dir_url( __FILE__ ) . 'v2/js/netopiaCustom.js',array(),'1.1' ,true);
@@ -123,13 +131,16 @@ function getAbsoulutFilePath() {
  * Decided which API should be used 
  * Check if plugin is configured for API v2
  * NOTE : it MUST HAVE LIVE API KEY in order to switch to api v2
+ * Note : If there is no any "woocommerce_netopiapayments_settings" as default , we will set API v2
  */
 function getNtpApiVer() {
     $ntpOptions = get_option( 'woocommerce_netopiapayments_settings' );
-    $hasLiveApiKey = array_key_exists('live_api_key', $ntpOptions) && !empty($ntpOptions['live_api_key']) ? true : false;
-    // $hasSandboxApiKey = array_key_exists('sandbox_api_key', $ntpOptions) && !empty($ntpOptions['sandbox_api_key']) ? true : false;
-	// $apiV = $hasLiveApiKey && $hasSandboxApiKey ? 2 : 1;
-
+	if($ntpOptions) {
+		$hasLiveApiKey = array_key_exists('live_api_key', $ntpOptions) && !empty($ntpOptions['live_api_key']) ? true : false;
+	} else {
+		$hasLiveApiKey = true;
+	}
+    
     $apiV = $hasLiveApiKey ? 2 : 1;
     return $apiV;
 }

@@ -233,7 +233,7 @@ class netopiapayments extends WC_Payment_Gateway {
       	if ( $this->description ) { ?>
         	<p><?php echo $this->description; ?></p>
   		<?php }
-  		if ( $this->payment_methods ) {  
+  		if ( @$this->payment_methods ) {  
   			$payment_methods = $this->payment_methods;	
   		}else{
   			$payment_methods = array('credit_card');
@@ -336,8 +336,10 @@ class netopiapayments extends WC_Payment_Gateway {
 	function receipt_page($order){
 		$customer_order = new WC_Order( $order );
 		$order_amount = sprintf('%.2f',$customer_order->get_total());
+		echo '<div id="ntpRedirectMsg">';
 		echo '<p>'.__('Multumim pentru comanda, te redirectionam in pagina de plata NETOPIA payments.', 'netopiapayments').'</p>';
 		echo '<p><strong>'.__('Total', 'netopiapayments').": ".$customer_order->get_total().' '.$customer_order->get_currency().'</strong></p>';
+		echo '</div>';
 		echo $this->generate_netopia_form($order);
 	}
 
@@ -465,7 +467,8 @@ class netopiapayments extends WC_Payment_Gateway {
 			</form>';
 		} catch (\Exception $e) {
 			// throw $th;
-			echo '<p><i style="color:red">Asigura-te ca ai incarcat toate cele 4 chei de securitate, 2 pentru mediul live, 2 pentru mediul sandbox! Citeste cu atentie instructiunile din manual!</i></p>
+			echo '<script> document.getElementById("ntpRedirectMsg").innerHTML = "<i style=\'color:red\'>Imi pare rau, nu putem sa redirectionam in pagina de plata NETOPIA payments</i>";</script>';
+			echo '<p><i style="color:red">Asigura-te ca ai configurat corect setarile pluginului.! Citeste cu atentie instructiunile din manual!</i></p>
 				 <p style="font-size:small">Ai in continuare probleme? Trimite-ne doua screenshot-uri la <a href="mailto:implementare@netopia.ro">implementare@netopia.ro</a>, unul cu setarile metodei de plata din adminul wordpress si unul cu locatia in care ai incarcat cheile (de preferat sa se vada denumirea completa a cheilor si calea completa a locatiei)</p>';
 		}
 	}	
