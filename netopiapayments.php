@@ -138,7 +138,7 @@ function getNtpApiVer() {
 	if($ntpOptions) {
 		$hasLiveApiKey = array_key_exists('live_api_key', $ntpOptions) && !empty($ntpOptions['live_api_key']) ? true : false;
 	} else {
-		$hasLiveApiKey = true;
+		$hasLiveApiKey = false;
 	}
     
     $apiV = $hasLiveApiKey ? 2 : 1;

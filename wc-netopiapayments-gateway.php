@@ -47,15 +47,16 @@ class netopiapayments extends WC_Payment_Gateway {
 			// class will be used instead
 
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+
+			// set schedule to verify Ceredential keys on Upgrade Plugin
+			add_action('upgrader_process_complete', 'setUpgradeStatus', 10, 2);
+
 			if(get_option( 'woocommerce_netopiapayments_certifications' ) === 'verify-and-regenerate') {	
 				if($this->account_id) {	
 					$this->certificateVerifyRegenerate($this->account_id);	
 					delete_option( 'woocommerce_netopiapayments_certifications' );// delete Option after executed one time	
 				}	
 			}
-
-		// set schedule to verify Ceredential keys on Upgrade Plugin
-		add_action('upgrader_process_complete', 'setUpgradeStatus', 10, 2);
 		}
 		
 		add_action('woocommerce_receipt_netopiapayments', array(&$this, 'receipt_page'));
