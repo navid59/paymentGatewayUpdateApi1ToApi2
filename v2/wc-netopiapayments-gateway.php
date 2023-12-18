@@ -11,6 +11,37 @@ include_once('lib/request.php');
 
 $request = new Request();
 class netopiapayments extends WC_Payment_Gateway {
+    /** 
+     * We just keeo the Dynamic property used in API v1 as well
+     * Becuse this values still exist in DB as well
+     * */ 
+    public $environment;
+    public $default_status;
+    public $key_setting;
+    public $account_id;
+    public $live_cer;
+    public $live_key;
+    public $sandbox_cer;
+    public $sandbox_key;
+    public $payment_methods;
+    public $sms_setting;
+    public $service_id;
+    //End Dynamic property used in API v1
+
+    // Dynamic property
+    public $live_api_key;
+    public $sandbox_api_key;
+    public $ntp_notify_value;
+    public $seckey;
+    public $hash;
+
+    // Dynamic property
+    public $favicon;
+    public $netopiLogo;
+    public $has_fields;
+    public $notify_url;
+    public $envMod;
+
     /**
      * Setup our Gateway's id, description and other values
      */ 

@@ -7,6 +7,29 @@ error_reporting(E_ALL);
 include_once('v2/setting/static.php');
 
 class netopiapayments extends WC_Payment_Gateway {
+	// Dynamic property
+	public $notify_url;
+	public $environment;
+	public $default_status;
+
+	// Dynamic Key Setting
+	public $key_setting;
+	public $account_id;
+	public $live_cer;
+	public $live_key;
+	public $sandbox_cer;
+	public $sandbox_key;
+
+	// Dynamic payment Method
+	public $payment_methods;
+
+	// Dynamic SMS properties
+	public $sms_setting;
+	public $service_id;
+
+	// Dynamic env mod properties
+	public $envMod;
+	
 	// Setup our Gateway's id, description and other values
 	function __construct() {
 		$this->id = "netopiapayments";
