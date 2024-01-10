@@ -11,4 +11,9 @@ This plugin is mix of API v1 & API v2
     Make a live test as well
 
     Payment status remind Platita and Payment status reminde Pending for payment, Is Normal if IPN Is Not working
+
+## Note 
+    From 2024/01/10 this stop updating reposotory "https://github.com/navid59/paymentGatewayUpdateApi1ToApi2.git"
+
+    and countinu updating in "https://github.com/navid59/WP-API-V2_auto-config_NP657.git"
     
